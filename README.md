@@ -6,6 +6,6 @@ Isto visa facilitar a distribuição de certificados, visto que bastaria carrega
 
 Também facilita a manutenção de certificados em ambientes com vários PDV's, você poderia carregar o certificado no banco de dados central e os PDV's lerem deste local facilmente.
 
-Para maiores informações veja os fontes.
+Para maiores informações veja os fontes, acompanha banco de dados firebird 2.5 e script simples para criação do banco de dados, ver pasta \bin.
 
 Aproveite e acesse meu blog https://regys.com.br e meu canal de Youtube https://www.youtube.com/regyssilveira onde vc pode encontrar vários vídeos de Delphi, Firedac entre outros.
