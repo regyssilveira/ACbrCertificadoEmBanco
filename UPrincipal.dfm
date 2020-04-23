@@ -1,9 +1,10 @@
-object Form1: TForm1
+object TFrmPrincipal: TTFrmPrincipal
   Left = 0
   Top = 0
-  Caption = 'Demo uso certificado no banco de dados'
-  ClientHeight = 187
-  ClientWidth = 633
+  BorderStyle = bsSingle
+  Caption = 'Demo uso de Certificado'
+  ClientHeight = 299
+  ClientWidth = 438
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,42 +12,79 @@ object Form1: TForm1
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object Button1: TButton
-    Left = 30
-    Top = 25
-    Width = 186
-    Height = 41
-    Caption = 'Carregar Certificado no Banco'
-    TabOrder = 0
-    OnClick = Button1Click
-  end
-  object Button2: TButton
-    Left = 30
-    Top = 72
-    Width = 186
-    Height = 41
-    Caption = 'Ler configura'#231#245'es'
-    TabOrder = 1
-    OnClick = Button2Click
-  end
-  object Button3: TButton
-    Left = 30
-    Top = 119
+  object BtnWebserviceStatus: TButton
+    Left = 235
+    Top = 242
     Width = 186
     Height = 41
     Caption = 'Verificar Status'
     TabOrder = 3
-    OnClick = Button3Click
+    OnClick = BtnWebserviceStatusClick
   end
-  object ListBox1: TListBox
-    Left = 230
-    Top = 25
-    Width = 376
-    Height = 135
+  object LstDadosCertificado: TListBox
+    Left = 15
+    Top = 102
+    Width = 406
+    Height = 134
     ItemHeight = 13
+    TabOrder = 1
+  end
+  object PageControl1: TPageControl
+    Left = 15
+    Top = 18
+    Width = 406
+    Height = 78
+    ActivePage = TabSheet2
+    TabOrder = 0
+    TabStop = False
+    TabWidth = 180
+    object TabSheet1: TTabSheet
+      Caption = 'Utilizar via Banco de dados'
+      object BtnCertificadoLerBD: TButton
+        Left = 195
+        Top = 3
+        Width = 186
+        Height = 41
+        Caption = 'Ler certificado do banco de dados'
+        TabOrder = 1
+        OnClick = BtnCertificadoLerBDClick
+      end
+      object BtnCertificadoGravarBD: TButton
+        Left = 3
+        Top = 3
+        Width = 186
+        Height = 41
+        Caption = 'Gravar aquivo no banco de dados'
+        TabOrder = 0
+        OnClick = BtnCertificadoGravarBDClick
+      end
+    end
+    object TabSheet2: TTabSheet
+      Caption = 'Utilizar Via URL'
+      ImageIndex = 1
+      object BtnCertificadoLerURL: TButton
+        Left = 3
+        Top = 3
+        Width = 186
+        Height = 41
+        Caption = 'Carregar Certificado de URL'
+        TabOrder = 0
+        OnClick = BtnCertificadoLerURLClick
+      end
+    end
+  end
+  object BtnLimpar: TButton
+    Left = 15
+    Top = 242
+    Width = 186
+    Height = 41
+    Caption = 'Limpar'
     TabOrder = 2
+    OnClick = BtnLimparClick
   end
   object ACBrNFe1: TACBrNFe
     Configuracoes.Geral.SSLLib = libNone
@@ -56,19 +94,20 @@ object Form1: TForm1
     Configuracoes.Geral.FormatoAlerta = 'TAG:%TAGNIVEL% ID:%ID%/%TAG%(%DESCRICAO%) - %MSG%.'
     Configuracoes.Geral.VersaoQRCode = veqr000
     Configuracoes.Arquivos.OrdenacaoPath = <>
+    Configuracoes.WebServices.Visualizar = True
     Configuracoes.WebServices.UF = 'SP'
     Configuracoes.WebServices.AguardarConsultaRet = 0
     Configuracoes.WebServices.QuebradeLinha = '|'
     Configuracoes.RespTec.IdCSRT = 0
-    Left = 350
-    Top = 40
+    Left = 140
+    Top = 130
   end
   object OpenDialog1: TOpenDialog
     DefaultExt = '.pfx'
     Filter = 'Arquivos de certificado|*.pfx'
     Title = 'Carregar Certificado'
-    Left = 270
-    Top = 40
+    Left = 60
+    Top = 130
   end
   object FDConn: TFDConnection
     Params.Strings = (
@@ -80,8 +119,8 @@ object Form1: TForm1
       'DriverID=FB')
     LoginPrompt = False
     BeforeConnect = FDConnBeforeConnect
-    Left = 275
-    Top = 105
+    Left = 60
+    Top = 180
   end
   object QryCertificado: TFDQuery
     Connection = FDConn
@@ -94,8 +133,8 @@ object Form1: TForm1
       '  tb_certificado'
       'ORDER BY '
       '  DT_CADASTRO DESC')
-    Left = 350
-    Top = 105
+    Left = 140
+    Top = 180
     object QryCertificadoDT_CADASTRO: TSQLTimeStampField
       FieldName = 'DT_CADASTRO'
       Origin = 'DT_CADASTRO'

@@ -11,33 +11,42 @@ uses
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.StdCtrls, ACBrBase, ACBrDFe,
   ACBrNFe, FireDAC.VCLUI.Error, FireDAC.VCLUI.Login, FireDAC.VCLUI.Async,
   FireDAC.VCLUI.Script, FireDAC.Phys.FBDef, FireDAC.Phys.IBBase,
-  FireDAC.Phys.FB, FireDAC.Comp.UI;
+  FireDAC.Phys.FB, FireDAC.Comp.UI, Vcl.ComCtrls;
 
 type
-  TForm1 = class(TForm)
+  TTFrmPrincipal = class(TForm)
     ACBrNFe1: TACBrNFe;
-    Button1: TButton;
-    Button2: TButton;
-    Button3: TButton;
+    BtnWebserviceStatus: TButton;
     OpenDialog1: TOpenDialog;
     FDConn: TFDConnection;
     QryCertificado: TFDQuery;
     QryCertificadoDT_CADASTRO: TSQLTimeStampField;
     QryCertificadoCERTIFICADO: TBlobField;
     QryCertificadoSENHA: TStringField;
-    ListBox1: TListBox;
-    procedure Button1Click(Sender: TObject);
+    LstDadosCertificado: TListBox;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
+    BtnCertificadoLerBD: TButton;
+    BtnCertificadoGravarBD: TButton;
+    BtnCertificadoLerURL: TButton;
+    BtnLimpar: TButton;
+    procedure BtnCertificadoGravarBDClick(Sender: TObject);
     procedure FDConnBeforeConnect(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
+    procedure BtnCertificadoLerBDClick(Sender: TObject);
+    procedure BtnWebserviceStatusClick(Sender: TObject);
+    procedure BtnCertificadoLerURLClick(Sender: TObject);
+    procedure BtnLimparClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
+    procedure PopularDadosCertificado;
     { Private declarations }
   public
     { Public declarations }
   end;
 
 var
-  Form1: TForm1;
+  TFrmPrincipal: TTFrmPrincipal;
 
 implementation
 
@@ -46,7 +55,22 @@ uses
 
 {$R *.dfm}
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TTFrmPrincipal.PopularDadosCertificado;
+begin
+  LstDadosCertificado.Clear;
+  LstDadosCertificado.Items.Add('Número de Série: '    + ACBrNFe1.SSL.CertNumeroSerie);
+  LstDadosCertificado.Items.Add('Razão Social: '       + ACBrNFe1.SSL.CertRazaoSocial);
+  LstDadosCertificado.Items.Add('CNPJ: '               + ACBrNFe1.SSL.CertCNPJ);
+  LstDadosCertificado.Items.Add('Data de Vencimento: ' + DateTimeToStr(ACBrNFe1.SSL.CertDataVenc));
+
+  case ACBrNFe1.SSL.CertTipo of
+    tpcDesconhecido : LstDadosCertificado.Items.Add('Tipo: Desconhecido');
+    tpcA1           : LstDadosCertificado.Items.Add('Tipo: A1');
+    tpcA3           : LstDadosCertificado.Items.Add('Tipo: A3');
+  end;
+end;
+
+procedure TTFrmPrincipal.BtnCertificadoGravarBDClick(Sender: TObject);
 begin
   if OpenDialog1.Execute then
   begin
@@ -65,7 +89,7 @@ begin
   end;
 end;
 
-procedure TForm1.Button2Click(Sender: TObject);
+procedure TTFrmPrincipal.BtnCertificadoLerBDClick(Sender: TObject);
 begin
   QryCertificado.Open;
   try
@@ -75,23 +99,29 @@ begin
     ACBrNFe1.Configuracoes.Certificados.DadosPFX := QryCertificadoCERTIFICADO.AsAnsiString;
     ACBrNFe1.Configuracoes.Certificados.Senha    := QryCertificadoSENHA.AsString;
 
-    ListBox1.Clear;
-    ListBox1.Items.Add('Número de Série: '    + ACBrNFe1.SSL.CertNumeroSerie);
-    ListBox1.Items.Add('Razão Social: '       + ACBrNFe1.SSL.CertRazaoSocial);
-    ListBox1.Items.Add('CNPJ: '               + ACBrNFe1.SSL.CertCNPJ);
-    ListBox1.Items.Add('Data de Vencimento: ' + DateTimeToStr(ACBrNFe1.SSL.CertDataVenc));
-
-    case ACBrNFe1.SSL.CertTipo of
-      tpcDesconhecido : ListBox1.Items.Add('Tipo: Desconhecido');
-      tpcA1           : ListBox1.Items.Add('Tipo: A1');
-      tpcA3           : ListBox1.Items.Add('Tipo: A3');
-    end;
+    PopularDadosCertificado;
   finally
     QryCertificado.Close;
   end;
 end;
 
-procedure TForm1.Button3Click(Sender: TObject);
+procedure TTFrmPrincipal.BtnCertificadoLerURLClick(Sender: TObject);
+begin
+  ACBrNFe1.Configuracoes.Geral.SSLLib          := TSSLLib.libWinCrypt;
+  ACBrNFe1.SSL.SSLType                         := TSSLType.LT_TLSv1_2;
+
+  ACBrNFe1.Configuracoes.Certificados.URLPFX := InputBox('Certificado', 'Informe a URL do certificado:', '');
+  ACBrNFe1.Configuracoes.Certificados.Senha  := InputBox('Senha', 'Informe a senha do certificado:', '');
+
+  PopularDadosCertificado;
+end;
+
+procedure TTFrmPrincipal.BtnLimparClick(Sender: TObject);
+begin
+  LstDadosCertificado.Clear;
+end;
+
+procedure TTFrmPrincipal.BtnWebserviceStatusClick(Sender: TObject);
 var
   Mensagem: string;
   CodigoStatus: Integer;
@@ -145,9 +175,15 @@ begin
   end;
 end;
 
-procedure TForm1.FDConnBeforeConnect(Sender: TObject);
+procedure TTFrmPrincipal.FDConnBeforeConnect(Sender: TObject);
 begin
   FDConn.Params.Values['database'] := ExtractFilePath(ParamStr(0)) + 'dados.fdb';
 end;
 
+procedure TTFrmPrincipal.FormCreate(Sender: TObject);
+begin
+  PageControl1.ActivePageIndex := 0;
+end;
+
 end.
+
