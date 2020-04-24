@@ -110,8 +110,14 @@ begin
   ACBrNFe1.Configuracoes.Geral.SSLLib          := TSSLLib.libWinCrypt;
   ACBrNFe1.SSL.SSLType                         := TSSLType.LT_TLSv1_2;
 
-  ACBrNFe1.Configuracoes.Certificados.URLPFX := InputBox('Certificado', 'Informe a URL do certificado:', '');
-  ACBrNFe1.Configuracoes.Certificados.Senha  := InputBox('Senha', 'Informe a senha do certificado:', '');
+  // informar caminho do arquivo para que o ACBr faça cache local
+  // o ACBr sempre vai tentar baixar novamente quando:
+  //   - faltarem 10 dias ou menos para vencimento do certificado
+  //   - não for encontrado arquivo no caminho especificado em ArquivoPFX
+  ACBrNFe1.Configuracoes.Certificados.ArquivoPFX := ExtractFilePath(ParamStr(0)) + 'certificado.pfx';
+
+  ACBrNFe1.Configuracoes.Certificados.URLPFX     := InputBox('Certificado', 'Informe a URL do certificado:', '');
+  ACBrNFe1.Configuracoes.Certificados.Senha      := InputBox('Senha', 'Informe a senha do certificado:', '');
 
   PopularDadosCertificado;
 end;
